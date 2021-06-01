@@ -50,6 +50,31 @@ class GoogleResult(object):
         else:
             return unidecode(str_element)
 
+def get_url(query, pages=1, lang='en', area='com', ncr=False, void=True, time_period=False, sort_by_date=False, first_page=0):
+    return _get_search_url(query, first_page, lang=lang, area=area, ncr=ncr, time_period=time_period, sort_by_date=sort_by_date)
+
+def get_results_from_html(html):
+    results = []
+    soup = BeautifulSoup(html, "html.parser")
+    divs = soup.findAll("div", attrs={"class": "g"})
+
+    results_div = soup.find("div", attrs={"id": "resultStats"})
+    number_of_results = _get_number_of_results(results_div)
+    
+    for li in divs:
+        res = GoogleResult()
+
+        res.name = _get_name(li)
+        res.link = _get_link(li)
+        res.google_link = _get_google_link(li)
+        res.description = _get_description(li)
+        res.thumb = _get_thumb()
+        res.cached = _get_cached(li)
+        res.is_pdf = _get_is_pdf(li)
+        
+        results.append(res)
+    return results        
+       
 
 # PUBLIC
 def search(query, pages=1, lang='en', area='com', ncr=False, void=True, time_period=False, sort_by_date=False, first_page=0):
